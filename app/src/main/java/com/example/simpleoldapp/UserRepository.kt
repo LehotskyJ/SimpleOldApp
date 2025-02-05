@@ -1,10 +1,16 @@
 package com.example.simpleoldapp
 
+import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
+class UserRepository @Inject constructor(private val api: ApiInterface) {
 
-class UserRepository @Inject constructor(){
+    suspend fun registerUser(registrationData: RegisterCred): Response<ResponseReg> {
+
+        return api.registerUser(registrationData)
+    }
+
 
 }

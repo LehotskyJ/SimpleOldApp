@@ -4,6 +4,7 @@ import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 
-interface ApiInterface {
+/*interface ApiInterface {
     @Headers("Content-Type:application/json")
     @POST("auth_tokens")
     fun signin(@Body info: RegisterCred): retrofit2.Call<ResponseBody>
@@ -22,12 +23,10 @@ interface ApiInterface {
     @POST("register")
     fun registerUser(
         @Body info: RegisterCred
-    ): retrofit2.Call<ResponseBody>
-}
+    ): Response<ResponseReg>
+}*/
 
-class RetrofitInstance {
-
-companion object {
+object RetrofitInstance {
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder().baseUrl(Constants.base_url)
             .addConverterFactory(GsonConverterFactory.create())
@@ -46,5 +45,11 @@ companion object {
             .readTimeout(1, TimeUnit.MINUTES)
             .build()
     }
+
+    val api: ApiInterface by lazy {
+        Retrofit.Builder().baseUrl(Constants.base_url)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiInterface::class.java)
     }
 }

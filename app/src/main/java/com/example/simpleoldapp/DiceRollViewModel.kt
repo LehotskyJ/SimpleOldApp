@@ -1,12 +1,16 @@
 package com.example.simpleoldapp
 
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
+import androidx.lifecycle.viewModelScope
 import javax.inject.Singleton
 import kotlin.random.Random
+import kotlinx.coroutines.launch
 
 data class DiceUiState(
     val firstDieValue: Int? = null,
@@ -14,8 +18,8 @@ data class DiceUiState(
     val numberOfRolls: Int = 0,
 )
 
-@Singleton
-class DiceRollViewModel : ViewModel() {
+@HiltViewModel
+class DiceRollViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
 
     // Expose screen UI state
     private val _uiState = MutableStateFlow(DiceUiState())
@@ -30,5 +34,24 @@ class DiceRollViewModel : ViewModel() {
                 numberOfRolls = currentState.numberOfRolls + 1,
             )
         }
+    }
+
+    // Register user
+    fun registerUser(registrationData: RegisterCred, onResult: (Int, String, ResponseReg?) -> Unit) {
+
+        viewModelScope.launch {
+            try {
+                val response = userRepository.registerUser(registrationData)
+                if (response.isSuccessful) {
+                    onResult(response.code(), response.message(), response.body())
+                } else {
+                    onResult(response.code(), response.message(), response.body())
+                }
+
+            } catch (e: Exception) {
+                onResult(0, e.message.toString(), null)
+            }
+        }
+
     }
 }
